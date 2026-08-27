@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./rankings.css";
 
 export const metadata: Metadata = {
   title: "PHOENIX | Baseball Club",
