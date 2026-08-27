@@ -19,7 +19,7 @@ async function readRange(sheet: string, range: string): Promise<SheetRow[]> {
   url.searchParams.set("headers", "1");
   url.searchParams.set("sheet", sheet);
   url.searchParams.set("range", range);
-  const response = await fetch(url, { next: { revalidate: 3600 } });
+  // Always fetch the public sheet so edits are reflected on the next request.\n  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Google Sheets request failed: ${response.status}`);
   const payload = await response.text();
   const match = payload.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?$/);
