@@ -1,6 +1,7 @@
 import { getTeamData } from "../../lib/sheets";
 
 export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 function StatTable({ title, headers, rows }: { title: string; headers: string[]; rows: string[][] }) {
   return <section className="stat-table"><h2>{title}</h2><div className="stat-head">{headers.map((header) => <span key={header}>{header}</span>)}</div>{rows.map((row) => <div className="stat-row" key={row[0]}>{row.map((value, index) => <span key={`${row[0]}-${index}`}>{value}</span>)}</div>)}</section>;

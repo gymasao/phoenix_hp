@@ -1,6 +1,7 @@
 import { getTeamData, type Batter } from "../../lib/sheets";
 
 export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const rankingItems: { label: string; key: keyof Batter; format?: string }[] = [
   { label: "打率", key: "average" }, { label: "出塁率", key: "onBase" }, { label: "長打率", key: "slugging" },
