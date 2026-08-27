@@ -24,8 +24,15 @@ async function readRange(sheet: string, range: string): Promise<SheetRow[]> {
   const match = payload.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?$/);
   if (!match) throw new Error("Google Sheets returned an unexpected response");
   const table = (JSON.parse(match[1]) as { table: GoogleTable }).table;
-  const headers = table.cols.map((column, index) => column.label?.trim() || `column-${index}`);
-  return table.rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, cellValue(row.c?.[index] ?? null)])));
+  const columnLabels = table.cols.map((column, index) => column.label?.trim() || `column-${index}`);
+  const rawRows = table.rows.map((row) => row.c?.map(cellValue) ?? []);
+  // Depending on the sheet's sharing/export state, Google may return generic
+  // Col1 labels and include the first spreadsheet row as data. Normalize both
+  // response shapes so the rest of the app can always use the sheet headers.
+  const hasGenericLabels = columnLabels.every((label) => /^column-\d+$/.test(label) || /^Col\d+$/.test(label));
+  const headers = hasGenericLabels && rawRows[0]?.some(Boolean) ? rawRows[0].map((header, index) => header || `column-${index}`) : columnLabels;
+  const rows = hasGenericLabels && rawRows[0]?.some(Boolean) ? rawRows.slice(1) : rawRows;
+  return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] ?? ""])));
 }
 
 function value(row: SheetRow, key: string) { return row[key] || "—"; }
