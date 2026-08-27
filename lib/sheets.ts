@@ -16,6 +16,7 @@ function cellValue(cell: GoogleCell) { return cell?.f ?? (cell?.v === null || ce
 async function readRange(sheet: string, range: string): Promise<SheetRow[]> {
   const url = new URL(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq`);
   url.searchParams.set("tqx", "out:json");
+  url.searchParams.set("headers", "1");
   url.searchParams.set("sheet", sheet);
   url.searchParams.set("range", range);
   const response = await fetch(url, { next: { revalidate: 3600 } });
