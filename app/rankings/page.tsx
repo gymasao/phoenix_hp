@@ -1,6 +1,6 @@
 import { getTeamData, type Batter } from "../../lib/sheets";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 const rankingItems: { label: string; key: keyof Batter; format?: string }[] = [
