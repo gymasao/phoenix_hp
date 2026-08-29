@@ -41,7 +41,13 @@ export async function getTeamData(): Promise<{ summary: TeamSummary; games: Game
       readRange("投手成績", "B5:Y105"),
     ]);
     const summaryRow = summaryRows.at(-1) ?? {};
-    const games = gameRows.filter((row) => value(row, "日付") !== "—" && value(row, "中止").toUpperCase() !== "TRUE").map((row) => ({ date: date(value(row, "日付")), type: value(row, "種別"), opponent: value(row, "対戦相手"), place: value(row, "場所"), result: value(row, "勝敗"), video: value(row, "動画リンク") === "-" ? "" : value(row, "動画リンク") }));
+    const games = gameRows.filter((row) => value(row, "日付") !== "—" && value(row, "中止").toUpperCase() !== "TRUE").map((row) => {
+      const winLose = value(row, "勝敗");
+      const score = value(row, "スコア");
+      const record = value(row, "対戦成績");
+      const result = score && score !== "—" ? `${winLose} ${score}`.trim() : (record !== "—" && record ? record : winLose);
+      return { date: date(value(row, "日付")), type: value(row, "種別"), opponent: value(row, "対戦相手"), place: value(row, "場所"), result, video: value(row, "動画リンク") === "-" ? "" : value(row, "動画リンク") };
+    });
     const batters = batterRows.filter((row) => value(row, "表示").toUpperCase() === "TRUE").map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), average: number(value(row, "打率"), 3).replace(/^0/, ""), games: value(row, "試合"), hits: value(row, "安打"), rbi: value(row, "打点"), ops: number(value(row, "OPS"), 3) })).sort((a, b) => Number(b.average) - Number(a.average));
     const pitchers = pitcherRows.filter((row) => value(row, "表示").toUpperCase() === "TRUE").map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), era: number(value(row, "防御率"), 2), games: value(row, "試合"), wins: value(row, "勝"), losses: value(row, "負"), saves: value(row, "セーブ"), strikeouts: value(row, "奪三振") })).sort((a, b) => Number(a.era) - Number(b.era));
     return { summary: { games: value(summaryRow, "試合"), wins: value(summaryRow, "勝ち"), losses: value(summaryRow, "負け"), draws: value(summaryRow, "引分"), winningPercentage: number(value(summaryRow, "勝率"), 3).replace(/^0/, ""), runs: value(summaryRow, "得点"), runsAllowed: value(summaryRow, "失点"), battingAverage: number(value(summaryRow, "打率"), 3).replace(/^0/, ""), era: number(value(summaryRow, "防御率"), 3), homeRuns: value(summaryRow, "本塁打"), stolenBases: value(summaryRow, "盗塁") }, games, batters, pitchers, updated: true };
