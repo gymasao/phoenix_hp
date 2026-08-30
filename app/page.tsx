@@ -22,6 +22,7 @@ export default async function Home() {
           <div className="nav-links">
             <a href="/results">RESULTS</a>
             <a href="/stats">STATS</a>
+            <a href="/players">PLAYERS</a>
             <a href="#about">ABOUT</a>
           </div>
           <a className="menu" href="#about">

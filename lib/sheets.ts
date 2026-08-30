@@ -44,6 +44,16 @@ export type Pitcher = {
   saves: string;
   strikeouts: string;
 };
+export type Member = {
+  id: string;
+  number: string;
+  name: string;
+  position: string;
+  department: string;
+  origin: string;
+  imageUrl: string;
+  comment: string;
+};
 
 const emptySummary: TeamSummary = {
   games: "—",
@@ -83,6 +93,12 @@ async function readRange(sheet: string, range: string): Promise<SheetRow[]> {
 function value(row: SheetRow, key: string) {
   return (row[key] ?? "").trim() || "—";
 }
+function memberValue(row: SheetRow, keys: string[]) {
+  const normalize = (key: string) => key.replace(/[\s　()（）]/g, "");
+  const normalizedKeys = new Set(keys.map(normalize));
+  const entry = Object.entries(row).find(([key]) => normalizedKeys.has(normalize(key)));
+  return entry ? entry[1].trim() || "—" : "—";
+}
 function isVisible(row: SheetRow) {
   const visible = value(row, "表示").toLowerCase();
   return (
@@ -92,6 +108,9 @@ function isVisible(row: SheetRow) {
 function hasPlayerName(row: SheetRow) {
   const name = value(row, "名前");
   return name !== "—" && name !== "";
+}
+function isUnpaidMember(row: SheetRow) {
+  return Object.values(row).some((cell) => cell.trim() === "未納");
 }
 function number(value: string, digits = 0) {
   const parsed = Number(value.replace(/,/g, ""));
@@ -107,14 +126,16 @@ export async function getTeamData(): Promise<{
   games: Game[];
   batters: Batter[];
   pitchers: Pitcher[];
+  members: Member[];
   updated: boolean;
 }> {
   try {
-    const [summaryRows, gameRows, batterRows, pitcherRows] = await Promise.all([
+    const [summaryRows, gameRows, batterRows, pitcherRows, memberRows] = await Promise.all([
       readRange("活動状況", "B21:L22").catch(() => readRange("活動状況", "B2:L30")),
       readRange("活動状況", "B25:K70").catch(() => readRange("活動状況", "B2:K80")),
       readRange("野手成績", "B6:Y200"),
       readRange("投手成績", "B5:Y200"),
+      readRange("メンバー", "B1:Z100"),
     ]);
     const summaryRow = summaryRows.at(-1) ?? {};
     const games = gameRows
@@ -165,6 +186,27 @@ export async function getTeamData(): Promise<{
         strikeouts: value(row, "奪三振"),
       }))
       .sort((a, b) => Number(a.era) - Number(b.era));
+    const members = memberRows
+      .filter(
+        (row) =>
+          !isUnpaidMember(row) &&
+          (isVisible(row) || memberValue(row, ["名前", "名前（敬称略）"]) !== "—")
+      )
+      .map((row) => {
+        const number = memberValue(row, ["背番号"]);
+        const name = memberValue(row, ["名前", "名前（敬称略）", "名前(敬称略)"]);
+        return {
+          id: `${number}-${name}`,
+          number: number === "—" ? "—" : `#${number}`,
+          name,
+          position: memberValue(row, ["守備位置", "ポジション"]),
+          department: memberValue(row, ["部署", "所属", "部門"]),
+          origin: memberValue(row, ["出身", "出身地", "出身校"]),
+          imageUrl: memberValue(row, ["写真URL", "画像URL", "写真", "画像"]),
+          comment: memberValue(row, ["コメント", "ひとこと", "紹介", "キャッチフレーズ"]),
+        };
+      })
+      .sort((first, second) => first.number.localeCompare(second.number, "en", { numeric: true }));
 
     return {
       summary: {
@@ -183,10 +225,18 @@ export async function getTeamData(): Promise<{
       games,
       batters,
       pitchers,
+      members,
       updated: true,
     };
   } catch (error) {
     console.error("Unable to load the PHOENIX score sheet", error);
-    return { summary: emptySummary, games: [], batters: [], pitchers: [], updated: false };
+    return {
+      summary: emptySummary,
+      games: [],
+      batters: [],
+      pitchers: [],
+      members: [],
+      updated: false,
+    };
   }
 }
