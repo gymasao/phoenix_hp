@@ -377,6 +377,56 @@ footer .brand span {
   width: 22px;
   height: 22px;
 }
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+}
+.login-form {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 40px;
+  color: #fff;
+  text-align: center;
+}
+.login-form .brand {
+  justify-content: center;
+  display: inline-flex;
+  align-self: center;
+}
+.login-copy {
+  font-size: 13px;
+  line-height: 1.8;
+  opacity: 0.8;
+}
+.login-form input {
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+}
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.login-form .button {
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+.login-form .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.login-error {
+  color: var(--orange);
+  font-size: 12px;
+}
 @media (max-width: 720px) {
   .container {
     padding-left: 20px;

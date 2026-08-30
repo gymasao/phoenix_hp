@@ -4,3 +4,7 @@ node_modules
 *.tsbuildinfo
 
 .pnpm-store/
+
+.env
+.env.local
+.env*.local
