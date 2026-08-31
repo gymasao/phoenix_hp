@@ -3,3 +3,8 @@ node_modules
 .vercel
 *.tsbuildinfo
 
+.pnpm-store/
+
+.env
+.env.local
+.env*.local
