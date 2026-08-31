@@ -8,7 +8,9 @@ export async function middleware(request: NextRequest) {
 
   // 環境変数が未設定の場合は認証をスキップ(ローカル開発などで誤って締め出さないため)
   if (!password || !secret) {
-    return NextResponse.next();
+    return new NextResponse("Authentication configuration error", {
+      status: 500,
+    });
   }
 
   const { pathname } = request.nextUrl;
