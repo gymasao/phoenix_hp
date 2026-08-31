@@ -28,28 +28,37 @@ async function readRange(sheet: string, range: string): Promise<SheetRow[]> {
   return table.rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, cellValue(row.c?.[index] ?? null)])));
 }
 
-function value(row: SheetRow, key: string) { return row[key] || "—"; }
+function value(row: SheetRow, key: string) { return (row[key] ?? "").trim() || "—"; }
+function isVisible(row: SheetRow) {
+  const visible = value(row, "表示").toLowerCase();
+  return visible === "true" || visible === "1" || visible === "○" || visible === "yes" || visible === "y";
+}
+function hasPlayerName(row: SheetRow) {
+  const name = value(row, "名前");
+  return name !== "—" && name !== "";
+}
 function number(value: string, digits = 0) { const parsed = Number(value.replace(/,/g, "")); return Number.isFinite(parsed) ? parsed.toFixed(digits) : "—"; }
 function date(value: string) { const match = value.match(/(\d{1,2})\D(\d{1,2})/); return match ? `${match[1].padStart(2, "0")}.${match[2].padStart(2, "0")}` : value; }
 
 export async function getTeamData(): Promise<{ summary: TeamSummary; games: Game[]; batters: Batter[]; pitchers: Pitcher[]; updated: boolean }> {
   try {
     const [summaryRows, gameRows, batterRows, pitcherRows] = await Promise.all([
-      readRange("活動状況", "B21:L22"),
-      readRange("活動状況", "B25:K70"),
-      readRange("野手成績", "B5:Y105"),
-      readRange("投手成績", "B5:Y105"),
+      readRange("活動状況", "B21:L22").catch(() => readRange("活動状況", "B2:L30")),
+      readRange("活動状況", "B25:K70").catch(() => readRange("活動状況", "B2:K80")),
+      readRange("野手成績", "B6:Y200"),
+      readRange("投手成績", "B5:Y200"),
     ]);
     const summaryRow = summaryRows.at(-1) ?? {};
-    const games = gameRows.filter((row) => value(row, "日付") !== "—" && value(row, "中止").toUpperCase() !== "TRUE").map((row) => {
+    const games = gameRows.filter((row) => value(row, "日付") !== "—" && value(row, "中止").trim().toUpperCase() !== "TRUE").map((row) => {
       const winLose = value(row, "勝敗");
       const score = value(row, "スコア");
       const record = value(row, "対戦成績");
       const result = score && score !== "—" ? `${winLose} ${score}`.trim() : (record !== "—" && record ? record : winLose);
       return { date: date(value(row, "日付")), type: value(row, "種別"), opponent: value(row, "対戦相手"), place: value(row, "場所"), result, video: value(row, "動画リンク") === "-" ? "" : value(row, "動画リンク") };
     });
-    const batters = batterRows.filter((row) => value(row, "表示").toUpperCase() === "TRUE").map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), average: number(value(row, "打率"), 3).replace(/^0/, ""), games: value(row, "試合"), hits: value(row, "安打"), rbi: value(row, "打点"), ops: number(value(row, "OPS"), 3) })).sort((a, b) => Number(b.average) - Number(a.average));
-    const pitchers = pitcherRows.filter((row) => value(row, "表示").toUpperCase() === "TRUE").map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), era: number(value(row, "防御率"), 2), games: value(row, "試合"), wins: value(row, "勝"), losses: value(row, "負"), saves: value(row, "セーブ"), strikeouts: value(row, "奪三振") })).sort((a, b) => Number(a.era) - Number(b.era));
+    const batters = batterRows.filter((row) => isVisible(row) || hasPlayerName(row)).map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), average: number(value(row, "打率"), 3).replace(/^0/, ""), games: value(row, "試合"), hits: value(row, "安打"), rbi: value(row, "打点"), ops: number(value(row, "OPS"), 3) })).sort((a, b) => Number(b.average) - Number(a.average));
+    const pitchers = pitcherRows.filter((row) => isVisible(row) || hasPlayerName(row)).map((row) => ({ number: `#${value(row, "背番号")}`, name: value(row, "名前"), era: number(value(row, "防御率"), 2), games: value(row, "試合"), wins: value(row, "勝"), losses: value(row, "負"), saves: value(row, "セーブ"), strikeouts: value(row, "奪三振") })).sort((a, b) => Number(a.era) - Number(b.era));
+
     return { summary: { games: value(summaryRow, "試合"), wins: value(summaryRow, "勝ち"), losses: value(summaryRow, "負け"), draws: value(summaryRow, "引分"), winningPercentage: number(value(summaryRow, "勝率"), 3).replace(/^0/, ""), runs: value(summaryRow, "得点"), runsAllowed: value(summaryRow, "失点"), battingAverage: number(value(summaryRow, "打率"), 3).replace(/^0/, ""), era: number(value(summaryRow, "防御率"), 3), homeRuns: value(summaryRow, "本塁打"), stolenBases: value(summaryRow, "盗塁") }, games, batters, pitchers, updated: true };
   } catch (error) {
     console.error("Unable to load the PHOENIX score sheet", error);
