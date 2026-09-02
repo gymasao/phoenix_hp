@@ -15,34 +15,19 @@ export default async function Home() {
   return (
     <main>
       <section className="hero" id="top">
-        <nav className="nav container">
-          <a className="brand" href="#top">
-            <span>P</span>HOENIX
-          </a>
-          <div className="nav-links">
-            <a href="/results">RESULTS</a>
-            <a href="/stats">STATS</a>
-            <a href="/players">PLAYERS</a>
-            <a href="#about">ABOUT</a>
-          </div>
-          <a className="menu" href="#about">
-            MENU <i />
-          </a>
-        </nav>
         <div className="hero-content container">
-          <p className="eyebrow">BASEBALL CLUB / EST. 2024</p>
           <h1>
-            RISE
+            <span className="company-title">NTTDATA</span>
             <br />
-            <em>TOGETHER.</em>
+            <em>PHOENIX</em>
           </h1>
           <p className="hero-copy">
             一球に、想いを。
             <br />
             PHOENIXは仲間と挑み、勝利を目指す野球チームです。
           </p>
-          <a className="button" href="/results">
-            試合結果を見る <b>→</b>
+          <a className="button" href="/about">
+            <b>→</b>
           </a>
         </div>
         <div className="hero-number">P</div>

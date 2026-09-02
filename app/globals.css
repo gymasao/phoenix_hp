@@ -33,15 +33,19 @@ a {
   min-height: 760px;
   overflow: hidden;
   color: #fff;
-  background: #112a30;
+  background-color: #112a30;
+  background-image: url("/images/top.jpg");
+  background-position: center 100px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 .hero:before {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(115deg, rgba(8, 25, 30, 0.93), rgba(18, 49, 50, 0.42)),
-    repeating-linear-gradient(-35deg, transparent 0 85px, rgba(215, 232, 66, 0.05) 86px 87px);
+    linear-gradient(90deg, rgba(8, 25, 30, 0.94) 0%, rgba(8, 25, 30, 0.72) 34%, rgba(8, 25, 30, 0.16) 76%, rgba(8, 25, 30, 0.32) 100%),
+    linear-gradient(180deg, rgba(8, 25, 30, 0.3), rgba(8, 25, 30, 0.12) 55%, rgba(8, 25, 30, 0.48));
 }
 .nav {
   position: relative;
@@ -50,6 +54,21 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  background: #112a30;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+.site-header a {
+  color: #fff;
+}
+.site-header .nav-links a:hover,
+.site-header .menu:hover {
+  color: var(--lime);
 }
 .brand {
   font:
@@ -437,6 +456,8 @@ footer .brand span {
   }
   .hero {
     min-height: 650px;
+    background-position: center 100px;
+    background-size: 100% auto;
   }
   .hero-content {
     padding-top: 115px;
@@ -514,12 +535,63 @@ footer .brand span {
 }
 .inner-page {
   min-height: 100vh;
+  padding-top: 100px;
+}
+.hero .button {
+  font-size: 0;
+}
+.hero .button::before {
+  content: "チームについて";
+  font-size: 13px;
+}
+.hero h1 .company-title {
+  display: inline-block;
+  font-size: 50%;
+  letter-spacing: -1px;
 }
 .inner-header {
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.inner-page .inner-header {
+  display: none;
+}
+.about-story {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 72px;
+  align-items: center;
+  padding-top: 100px;
+  padding-bottom: 110px;
+}
+.about-photo-wrap { overflow: hidden; }
+.about-photo { display: block; width: 100%; height: auto; }
+.about-story-copy h2,
+.about-info h2 { margin: 0 0 24px; font-size: clamp(34px, 4vw, 56px); line-height: 1; }
+.about-story-copy h2 em { color: var(--orange); font-style: normal; }
+.about-story-copy > p:last-child,
+.contact-card > p:not(.eyebrow) { line-height: 2; }
+.about-info { background: #eef1e7; padding: 100px 0; }
+.about-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.info-lead { line-height: 1.8; }
+.activity-list { margin: 32px 0 0; border-top: 1px solid #c6cec0; }
+.activity-list div { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid #c6cec0; }
+.activity-list dt { font-weight: 700; }
+.activity-list dd { margin: 0; }
+.other-activities { margin-top: 44px; }
+.other-activities h3 { margin: 0 0 12px; font-size: 25px; }
+.other-activities p:last-child { margin: 0; line-height: 1.8; }
+.contact-card { padding: 40px; background: #112a30; color: #fff; }
+.contact-card h2 { color: #fff; }
+.qr-placeholder { width: 150px; height: 150px; margin: 28px auto 12px; padding: 8px; background: #fff; }
+.qr-placeholder img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.qr-note { color: rgba(255,255,255,.65); font-size: 11px; line-height: 1.6; }
+@media (max-width: 720px) {
+  .about-story, .about-info-grid { grid-template-columns: 1fr; gap: 42px; }
+  .about-story { padding-top: 64px; padding-bottom: 72px; }
+  .about-info { padding: 72px 0; }
 }
 .inner-header > a:last-child {
   font: 700 13px "Barlow Condensed";
