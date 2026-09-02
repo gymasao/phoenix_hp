@@ -155,17 +155,7 @@ export default async function Home() {
       <section className="about" id="about">
         <div className="container about-inner">
           <p className="eyebrow">ABOUT PHOENIX</p>
-          <h2>
-            WE PLAY
-            <br />
-            AS <em>ONE.</em>
-          </h2>
-          <p>
-            野球を愛する仲間が集まり、ひとつのチームになる。
-            <br />
-            勝つことを楽しみ、挑戦することを誇りに思う。
-          </p>
-          <a href="#top">
+          <a href="/about">
             チームについて <b>→</b>
           </a>
         </div>

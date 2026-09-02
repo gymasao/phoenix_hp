@@ -360,7 +360,7 @@ a {
 .about {
   color: #fff;
   background: var(--orange);
-  padding: 104px 0;
+  padding: 140px 0;
 }
 .about .eyebrow {
   color: var(--ink);
@@ -515,7 +515,7 @@ footer .brand span {
     grid-template-columns: 1fr 65px 48px 48px;
   }
   .about {
-    padding: 76px 0;
+    padding: 96px 0;
   }
   footer {
     height: auto;
@@ -539,6 +539,7 @@ footer .brand span {
 }
 .hero .button {
   font-size: 0;
+  margin-top: 8px;
 }
 .hero .button::before {
   content: "チームについて";
